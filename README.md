@@ -4,7 +4,7 @@ A modern React application for discovering and exploring places in Kuala Lumpur,
 
 ## Project Overview
 
-Place Finder is a full-featured location discovery application that allows users to:
+Place Finder is a location discovery application that allows users to:
 - Search for places using Google Places API and Google Place Autocomplete API
 - View places on an interactive map
 - Get detailed information about each location
@@ -34,7 +34,8 @@ Place Finder is a full-featured location discovery application that allows users
 ### Project Structure
 ```
 src/
-├── components/         # React components
+├── components/        # React components
+├── data/              # Data of Maybank Branches
 ├── store/             # Redux store and slices
 ├── services/          # API and external services
 ├── hooks/             # Custom React hooks
@@ -55,8 +56,7 @@ src/
 
 ### Services
 - **placesService** - Google Places API integration
-- **API Configuration** - Centralized API settings
-- **Mock Data** - Fallback data for testing and failures
+- **api** - Centralized API settings
 
 ## Notable Features
 
