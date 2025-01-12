@@ -17,12 +17,14 @@ Place Finder allows users to:
 ## Assessment of Requirements
 
 1. **Autocomplete Functionality**:
-   - The project implements a textbox that uses the Google Place Autocomplete API through the `SearchBar` component
-   - Suggests places as the user types, fulfilling this requirement
+   - The project implements Google Place Autocomplete API through the `SearchBar` component with region restriction to Malaysia
+   - Suggests places as the user types with graceful handling of ZERO_RESULTS
+   - Custom hook `useGoogleMapsService` manages the service lifecycle
 
 2. **Fallback Option**:
    - The application has a fallback mechanism using mock data in the `placesService.ts` file
-   - If the Google Places API fails, it retrieves data from `mockPlaces`, meeting this requirement
+   - Quick suggestion buttons for common searches
+   - Clear feedback when API fails or returns no results
 
 3. **State Management**:
    - Redux is used for state management, with the `placesSlice` managing search results and user queries
@@ -38,8 +40,9 @@ Place Finder allows users to:
    - Responsive layout for both desktop and mobile
 
 6. **Code Structure**:
-   - Organized into clear component structure
-   - Clean separation of concerns and reusable components
+   - Organized with custom hooks for reusable logic
+   - Clean separation of concerns with marker management
+   - Type-safe implementations throughout the codebase
 
 ## Technical Stack
 

@@ -4,50 +4,74 @@ import { Search } from 'lucide-react';
 import { useDispatch } from 'react-redux';
 import { searchPlaces } from '../store/placesSlice';
 import type { AppDispatch } from '../store/store';
+import { useGoogleMapsService } from '../hooks/useGoogleMapsService';
 
-const SUGGESTIONS = [
-  'Maybank',
-  'Restaurant',
-  'Shopping Mall',
-  'Park',
-];
+// Quick access suggestions
+const SUGGESTIONS = ['Maybank', 'Restaurant', 'Shopping Mall', 'Park'];
 
 const SearchBar: React.FC = () => {
   const [searchText, setSearchText] = useState('');
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const dispatch = useDispatch<AppDispatch>();
-  const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
-  const searchBoxRef = useRef<HTMLDivElement>(null);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const dispatch = useDispatch<AppDispatch>();
+  const searchBoxRef = useRef<HTMLDivElement>(null);
+  const { service, error } = useGoogleMapsService();
 
-  useEffect(() => {
-    const initAutocomplete = () => {
-      if (window.google?.maps?.places) {
-        try {
-          autocompleteService.current = new window.google.maps.places.AutocompleteService();
-        } catch (error) {
-          console.error('Failed to initialize AutocompleteService:', error);
-        }
-      }
-    };
+  // Handle search submission
+  const handleSearch = (text: string = searchText) => {
+    const trimmedText = text.trim();
+    if (trimmedText) {
+      dispatch(searchPlaces(trimmedText));
+      setShowSuggestions(false);
+      setSuggestions([]);
+    }
+  };
 
-    if (window.google?.maps?.places) {
-      initAutocomplete();
-    } else {
-      const checkGoogleMapsInterval = setInterval(() => {
-        if (window.google?.maps?.places) {
-          initAutocomplete();
-          clearInterval(checkGoogleMapsInterval);
-        }
-      }, 100);
+  // Handle input changes and fetch autocomplete suggestions
+  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchText(value);
 
-      setTimeout(() => clearInterval(checkGoogleMapsInterval), 10000);
-
-      return () => {
-        clearInterval(checkGoogleMapsInterval);
-      };
+    if (!value.trim() || !service) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
     }
 
+    try {
+      const predictions = await new Promise<google.maps.places.AutocompletePrediction[]>((resolve, reject) => {
+        service.getPlacePredictions(
+          {
+            input: value,
+            componentRestrictions: { country: 'MY' },
+            types: ['establishment', 'geocode'],
+          },
+          (results, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+              resolve(results);
+            } else {
+              reject(status);
+            }
+          }
+        );
+      });
+
+      setSuggestions(predictions.map(p => p.description));
+      setShowSuggestions(true);
+    } catch (error) {
+      if (error === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
+        // No need to show error for no results
+        setSuggestions([]);
+        setShowSuggestions(false);
+      } else {
+        console.error('Autocomplete error:', error);
+        setSuggestions([]);
+      }
+    }
+  };
+
+  // Handle clicks outside search box
+  useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (searchBoxRef.current && !searchBoxRef.current.contains(event.target as Node)) {
         setShowSuggestions(false);
@@ -58,48 +82,9 @@ const SearchBar: React.FC = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleSearch = (text: string = searchText) => {
-    if (text.trim()) {
-      dispatch(searchPlaces(text));
-      setShowSuggestions(false);
-      setSuggestions([]);
-    }
-  };
-
-  const handleInputChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchText(value);
-
-    if (value.trim() && autocompleteService.current) {
-      try {
-        const predictions = await new Promise<google.maps.places.AutocompletePrediction[]>((resolve, reject) => {
-          autocompleteService.current!.getPlacePredictions(
-            {
-              input: value,
-              componentRestrictions: { country: 'MY' },
-              types: ['establishment', 'geocode'],
-            },
-            (results, status) => {
-              if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                resolve(results);
-              } else {
-                reject(status);
-              }
-            }
-          );
-        });
-
-        setSuggestions(predictions.map(p => p.description));
-        setShowSuggestions(true);
-      } catch (error) {
-        console.error('Autocomplete error:', error);
-        setSuggestions([]);
-      }
-    } else {
-      setSuggestions([]);
-      setShowSuggestions(false);
-    }
-  };
+  if (error) {
+    console.error('Google Maps service error:', error);
+  }
 
   return (
     <div ref={searchBoxRef} className="search-box">
@@ -115,16 +100,14 @@ const SearchBar: React.FC = () => {
           }}
           prefix={<Search className="search-icon" />}
           placeholder="Search for places..."
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') {
-              handleSearch();
-            }
-          }}
+          onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
         />
         <Button size="large" type="primary" onClick={() => handleSearch()}>
           Search
         </Button>
       </div>
+
+      {/* Quick suggestion buttons */}
       <div className="search-suggestions">
         <span className="suggestion-label">Suggestions: </span>
         {SUGGESTIONS.map((suggestion) => (
@@ -140,6 +123,8 @@ const SearchBar: React.FC = () => {
           </Button>
         ))}
       </div>
+
+      {/* Autocomplete suggestions dropdown */}
       {showSuggestions && suggestions.length > 0 && (
         <div className="autocomplete-suggestions">
           {suggestions.map((suggestion, index) => (

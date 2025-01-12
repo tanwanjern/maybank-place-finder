@@ -1,13 +1,19 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { GoogleMap, useLoadScript } from '@react-google-maps/api';
 import { RootState } from '../store/store';
 import { Spin } from 'antd';
 import PlaceInfoWindow from './PlaceInfoWindow';
+import { useMarkers } from '../hooks/useMarkers';
 import { Place } from '../types/place';
 
+// Required libraries for Google Maps functionality
 const LIBRARIES: ("places" | "marker")[] = ["places", "marker"];
+
+// Default map center (Kuala Lumpur)
 const DEFAULT_CENTER = { lat: 3.1390, lng: 101.6869 };
+
+// Map configuration options
 const MAP_OPTIONS = {
   zoomControl: true,
   mapTypeControl: false,
@@ -17,57 +23,30 @@ const MAP_OPTIONS = {
 };
 
 const Map: React.FC = () => {
+  // Redux state for places
   const { selectedPlace, searchResults } = useSelector((state: RootState) => state.places);
+  
+  // Local state and refs
   const [activeMarker, setActiveMarker] = useState<string | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const mapRef = useRef<google.maps.Map | null>(null);
-  const markersRef = useRef<{ [key: string]: google.maps.marker.AdvancedMarkerElement }>({});
 
+  // Load Google Maps with required libraries
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries: LIBRARIES
   });
 
-  const handleMarkerClick = (placeId: string) => {
-    setActiveMarker(placeId);
-  };
+  // Setup markers
+  const placesToShow = selectedPlace ? [selectedPlace] : searchResults;
+  useMarkers({
+    map: mapRef.current,
+    places: placesToShow,
+    onMarkerClick: setActiveMarker,
+    isMapLoaded
+  });
 
-  const createMarker = (place: Place) => {
-    if (!mapRef.current || !isMapLoaded) return;
-
-    const marker = new google.maps.marker.AdvancedMarkerElement({
-      position: place.coordinates,
-      title: place.name,
-      map: mapRef.current,
-    });
-
-    marker.addListener('click', () => handleMarkerClick(place.id));
-    markersRef.current[place.id] = marker;
-  };
-
-  const updateMarkers = () => {
-    if (!mapRef.current || !isMapLoaded) return;
-
-    // Clear existing markers
-    Object.values(markersRef.current).forEach(marker => {
-      marker.map = null;
-    });
-    markersRef.current = {};
-
-    // Add new markers
-    const placesToShow = selectedPlace ? [selectedPlace] : searchResults;
-    placesToShow.forEach(createMarker);
-  };
-
-  useEffect(() => {
-    updateMarkers();
-    return () => {
-      Object.values(markersRef.current).forEach(marker => {
-        marker.map = null;
-      });
-    };
-  }, [selectedPlace, searchResults, isMapLoaded]);
-
+  // Handle loading states
   if (loadError) {
     return (
       <div className="loading-container">
@@ -84,6 +63,7 @@ const Map: React.FC = () => {
     );
   }
 
+  // Render info window for a place
   const renderInfoWindow = (place: Place) => (
     activeMarker === place.id && (
       <PlaceInfoWindow
