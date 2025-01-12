@@ -8,6 +8,7 @@ interface PlacesState {
   loading: boolean;
   error: string | null;
   hasSearched: boolean;
+  markers: any[];
 }
 
 const initialState: PlacesState = {
@@ -16,6 +17,7 @@ const initialState: PlacesState = {
   loading: false,
   error: null,
   hasSearched: false,
+  markers: [],
 };
 
 // Redux Thunk middleware is already included by default. 
@@ -45,6 +47,9 @@ const placesSlice = createSlice({
       state.hasSearched = false;
       state.error = null;
     },
+    clearMapMarkers: (state) => {
+      state.markers = [];
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -66,5 +71,5 @@ const placesSlice = createSlice({
   },
 });
 
-export const { setSelectedPlace, clearSearchResults } = placesSlice.actions;
+export const { setSelectedPlace, clearSearchResults, clearMapMarkers } = placesSlice.actions;
 export default placesSlice.reducer;

@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Input, Button } from 'antd';
 import { Search } from 'lucide-react';
 import { useDispatch } from 'react-redux';
-import { searchPlaces } from '../store/placesSlice';
+import { searchPlaces, clearMapMarkers, setSelectedPlace } from '../store/placesSlice';
 import type { AppDispatch } from '../store/store';
 import { useGoogleMapsService } from '../hooks/useGoogleMapsService';
 import debounce from 'lodash/debounce';
@@ -67,6 +67,7 @@ const SearchBar: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchText(value);
+    setSuggestions([]);
     debouncedAutocomplete(value);
   };
 
@@ -74,9 +75,12 @@ const SearchBar: React.FC = () => {
   const handleSearch = (text: string = searchText) => {
     const trimmedText = text.trim();
     if (trimmedText) {
+      dispatch(clearMapMarkers());
+      dispatch(setSelectedPlace(null));
       dispatch(searchPlaces(trimmedText));
       setShowSuggestions(false);
       setSuggestions([]);
+      setSearchText('');
     }
   };
 
