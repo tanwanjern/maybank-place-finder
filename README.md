@@ -1,103 +1,86 @@
 # Maybank Place Finder
 
-A modern React application for discovering and exploring places in Kuala Lumpur, built with TypeScript and Redux.
+A modern single-page application built with React, TypeScript, and Redux for discovering and exploring places in Kuala Lumpur. This application utilizes the Google Places API for autocomplete functionality and displays results on an interactive map.
 
 ## Project Overview
 
-Place Finder is a location discovery application that allows users to:
-- Search for places using Google Places API and Google Place Autocomplete API
-- View places on an interactive map
-- Get detailed information about each location
+Place Finder allows users to:
+- Search for places using the Google Places Autocomplete API
+- View places on an interactive map with detailed info windows
+- Get detailed information about each location including:
+  - Place photos from Google Places API
+  - Place names and addresses
+  - Direct access to Google Maps directions
 - Access directions to selected places
 - View place information and ratings
 
+## Assessment of Requirements
+
+1. **Autocomplete Functionality**:
+   - The project implements a textbox that uses the Google Place Autocomplete API through the `SearchBar` component
+   - Suggests places as the user types, fulfilling this requirement
+
+2. **Fallback Option**:
+   - The application has a fallback mechanism using mock data in the `placesService.ts` file
+   - If the Google Places API fails, it retrieves data from `mockPlaces`, meeting this requirement
+
+3. **State Management**:
+   - Redux is used for state management, with the `placesSlice` managing search results and user queries
+   - Implements proper state handling for place selection and search results
+
+4. **Middleware Integration**:
+   - The project uses Redux Thunk for handling asynchronous actions
+   - Integrated into the `placesSlice` for fetching places and photos
+
+5. **User Interface**:
+   - Clean and modern UI using Ant Design components
+   - Enhanced info windows with place photos and directions
+   - Responsive layout for both desktop and mobile
+
+6. **Code Structure**:
+   - Organized into clear component structure
+   - Clean separation of concerns and reusable components
+
 ## Technical Stack
 
-### Core Technologies
 - **React 18** - UI library
 - **TypeScript** - Type safety and better developer experience
 - **Redux Toolkit** - State management
-- **Google Maps API** - Maps and places data
+- **Google Maps API** - Maps, places data, and photos
 - **Ant Design** - UI component library
 - **Vite** - Build tool and development server
-
-### Key Features
-- **Responsive Design** - Fully responsive layout with mobile-first approach
-- **Real-time Search** - Autocomplete suggestions for place search
-- **Interactive Map** - Google Maps integration with markers and place selection
-- **State Management** - Centralized state with Redux and middleware
-- **Error Handling** - Graceful fallback to mock data when API fails
-- **Type Safety** - Full TypeScript implementation for robust code
 
 ## Architecture
 
 ### Project Structure
 ```
 src/
-├── components/        # React components
-├── data/              # Data of Maybank Branches
-├── store/             # Redux store and slices
-├── services/          # API and external services
-├── hooks/             # Custom React hooks
-├── types/             # TypeScript type definitions
-├── utils/             # Utility functions
-└── styles/            # Global styles
+├── components/ # React components
+├── data/ # Data of Maybank Branches
+├── store/ # Redux store and slices
+├── services/ # API and external services
+├── hooks/ # Custom React hooks
+├── types/ # TypeScript type definitions
+├── utils/ # Utility functions
+└── styles/ # Global styles
 ```
 
 ### Key Components
 - **App.tsx** - Main application component and layout
 - **SearchBar** - Search functionality with autocomplete
-- **Map** - Google Maps integration
+- **Map** - Google Maps integration with Advanced Markers
 - **PlaceList** - List of search results
-- **PlaceCard** - Individual place display
+- **PlaceCard** - Individual place display with photos
+- **PlaceInfoWindow** - Enhanced place information display
 
-### State Management
-- **Redux Store** - Central state management
+## Key Features
 
-### Services
-- **placesService** - Google Places API integration
-- **api** - Centralized API settings
-
-## Notable Features
-
-### 1. Advanced Search
-- Real-time autocomplete suggestions
-- Location-based search within Kuala Lumpur
-- Quick search suggestions
-
-### 2. Interactive Map
-- Dynamic markers for search results
-- Smooth transitions on place selection
-- Responsive map controls
-
-### 3. Mobile Optimization
-- Responsive layout
-- Bottom sheet for mobile place list
-- Touch-friendly interactions
-
-### 4. Error Handling
-- Graceful degradation with mock data
-- Service initialization retry mechanism
-- Comprehensive error states
-
-## Performance Considerations
-
-1. **Code Splitting**
-   - Component-based splitting
-   - Lazy loading of map components
-
-2. **State Management**
-   - Efficient Redux updates
-
-3. **API Optimization**
-   - Debounced search
-   - Caching of place data
-
-## Testing and Quality
-
-- TypeScript for type safety
-- Error boundary implementation
-- Consistent code style with ESLint
+- **Autocomplete Functionality**: The application features a textbox that suggests places as the user types, leveraging the Google Places Autocomplete API.
+- **Fallback Option**: In case the Google Places API is unavailable, the application uses mock data to ensure a seamless user experience.
+- **State Management**: Redux is employed to manage and store search results, ensuring that all user queries and results are saved and displayed appropriately.
+- **Middleware Integration**: Redux Thunk is integrated to handle asynchronous actions, allowing for efficient data fetching.
+- **User Interface**: The UI is designed using Ant Design components, providing a simple and intuitive experience for users.
+- **Scalable Code Structure**: The project is organized in a scalable and maintainable manner, utilizing ES6 features, High Order Components, and functional programming principles.
 
 ## Development Setup
 
@@ -106,9 +89,10 @@ src/
    ```bash
    npm install
    ```
-3. Set up environment variables:
-   ```
+3. Set up environment variables in `.env`:
+   ```env
    VITE_GOOGLE_MAPS_API_KEY=your_api_key
+   VITE_GOOGLE_MAPS_ID=your_map_id  # Required for Advanced Markers
    ```
 4. Start development server:
    ```bash
@@ -118,6 +102,9 @@ src/
 ## Build and Deployment
 
 ```bash
+# Build for development
+npm run dev
+
 # Build for production
 npm run build
 
