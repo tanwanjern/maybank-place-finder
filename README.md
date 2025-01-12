@@ -76,15 +76,6 @@ src/
 - **PlaceCard** - Individual place display with photos
 - **PlaceInfoWindow** - Enhanced place information display
 
-## Key Features
-
-- **Autocomplete Functionality**: The application features a textbox that suggests places as the user types, leveraging the Google Places Autocomplete API.
-- **Fallback Option**: In case the Google Places API is unavailable, the application uses mock data to ensure a seamless user experience.
-- **State Management**: Redux is employed to manage and store search results, ensuring that all user queries and results are saved and displayed appropriately.
-- **Middleware Integration**: Redux Thunk is integrated to handle asynchronous actions, allowing for efficient data fetching.
-- **User Interface**: The UI is designed using Ant Design components, providing a simple and intuitive experience for users.
-- **Scalable Code Structure**: The project is organized in a scalable and maintainable manner, utilizing ES6 features, High Order Components, and functional programming principles.
-
 ## Development Setup
 
 1. Clone the repository
