@@ -66,6 +66,7 @@ export const searchNearbyPlaces = async (query: string): Promise<Place[]> => {
             },
             rating: result.rating || 0,
             type: result.types || [],
+            photoUrl: result.photos?.[0]?.getUrl() || undefined,
           }));
           resolve(places);
         } else {

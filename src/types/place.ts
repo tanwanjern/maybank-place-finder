@@ -10,4 +10,5 @@ export interface Place {
   };
   rating: number;
   type: string[];
+  photoUrl?: string;
 }

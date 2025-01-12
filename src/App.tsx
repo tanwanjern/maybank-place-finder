@@ -65,7 +65,13 @@ const App: React.FC = () => {
           token: {
             colorPrimary: '#3b82f6',
             borderRadius: 8,
+            padding: 16
           },
+          components: {
+            Card: {
+              bodyPadding: 16
+            }
+          }
         }}
       >
         <AppContent />

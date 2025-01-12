@@ -26,6 +26,13 @@ const PlaceCard: React.FC<PlaceCardProps> = ({ place, onClick }) => {
       className={`place-card ${isSelected ? 'selected' : ''}`}
       onClick={onClick}
     >
+      {place.photoUrl && (
+        <img 
+          src={place.photoUrl} 
+          alt={place.name} 
+          className="place-card-image" 
+        />
+      )}
       <div className="place-card-content">
         <div className="place-info">
           <h3 className="place-title">{place.name}</h3>
