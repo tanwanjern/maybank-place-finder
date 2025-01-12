@@ -5,6 +5,7 @@ import { RootState } from '../store/store';
 import { Spin } from 'antd';
 import PlaceInfoWindow from './PlaceInfoWindow';
 import { useMarkers } from '../hooks/useMarkers';
+import { useMediaQuery } from '../hooks/useMediaQuery';
 import { Place } from '../types/place';
 
 // Required libraries for Google Maps functionality
@@ -23,21 +24,17 @@ const MAP_OPTIONS = {
 };
 
 const Map: React.FC = () => {
-  // Redux state for places
   const { selectedPlace, searchResults } = useSelector((state: RootState) => state.places);
-  
-  // Local state and refs
   const [activeMarker, setActiveMarker] = useState<string | null>(null);
   const [isMapLoaded, setIsMapLoaded] = useState(false);
   const mapRef = useRef<google.maps.Map | null>(null);
+  const isMobile = useMediaQuery('(max-width: 768px)');
 
-  // Load Google Maps with required libraries
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: import.meta.env.VITE_GOOGLE_MAPS_API_KEY,
     libraries: LIBRARIES
   });
 
-  // Setup markers
   const placesToShow = selectedPlace ? [selectedPlace] : searchResults;
   useMarkers({
     map: mapRef.current,
@@ -46,7 +43,6 @@ const Map: React.FC = () => {
     isMapLoaded
   });
 
-  // Handle loading states
   if (loadError) {
     return (
       <div className="loading-container">
@@ -63,9 +59,8 @@ const Map: React.FC = () => {
     );
   }
 
-  // Render info window for a place
   const renderInfoWindow = (place: Place) => (
-    activeMarker === place.id && (
+    !isMobile && activeMarker === place.id && (
       <PlaceInfoWindow
         key={place.id}
         place={place}
