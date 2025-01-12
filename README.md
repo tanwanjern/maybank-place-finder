@@ -2,6 +2,8 @@
 
 A modern single-page application built with React, TypeScript, and Redux for discovering and exploring places in Kuala Lumpur. This application utilizes the Google Places API for autocomplete functionality and displays results on an interactive map.
 
+Demo: maybank-place-finder.vercel.app
+
 ## Project Overview
 
 Place Finder allows users to:
@@ -96,9 +98,6 @@ src/
 ## Build and Deployment
 
 ```bash
-# Build for development
-npm run dev
-
 # Build for production
 npm run build
 
